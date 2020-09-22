@@ -1,0 +1,92 @@
+# Options for the http server
+server:
+  # The listen address and port
+  address: "0.0.0.0"
+  port: 8080
+  # Uncomment the "tls_config" block to enable HTTPS support in the server.
+  # The cert and key files must be usable by net/http.ListenAndServeTLS().
+  # tls_config:
+  #   cert_file: /path/to/server.pem
+  #   key_file: /path/to/server.key
+
+# Options for logging output
+logging:
+  # If true, logs are printed in human-readable form. We recommend using
+  # "false" to output JSON-formatted logs in production
+  text: false
+  # Set a minimum logging level threshold
+  # Choose from: debug, info, warn, error
+  level: debug
+
+# Options for the GitHub response cache. When the cache reaches max_size, the
+# oldest entries are evicted. Size properties can use any format supported by
+# https://github.com/c2h5oh/datasize
+#
+# cache:
+#   max_size: "50MB"
+
+# Options for webhook processing workers. Events are dropped if the queue is
+# full. The defaults are shown below.
+#
+# workers:
+#   workers: 10
+#   queue_size: 100
+#   github_timeout: 10s
+
+# Options for Datadog metrics
+#
+# datadog:
+#   address: "127.0.0.1:8125"
+#   interval: 10s
+#   tags: []
+
+# Options for connecting to GitHub
+github:
+  # The URL of the GitHub homepage. Can also be set by the GITHUB_WEB_URL
+  # environment variable.
+  web_url: "https://github.com"
+  # The base URL for v3 (REST) API requests. Can also be set by the
+  # GITHUB_V3_API_URL environment variable.
+  v3_api_url: "https://api.github.com"
+  # The base URL for v4 (GraphQL) API requests. Can also be set by the
+  # GITHUB_V4_API_URL environment variable.
+  v4_api_url: "https://api.github.com/graphql"
+  app:
+    # The integration ID of the GitHub app. Can also be set by the
+    # GITHUB_APP_INTEGRATION_ID environment variable.
+    integration_id: 1
+    # A random string used to validate webhooks. Can also be set by the
+    # GITHUB_APP_WEBHOOK_SECRET environment variable.
+    webhook_secret: "app_secret"
+    # The private key of the GitHub app. Can also be set by the
+    # GITHUB_APP_PRIVATE_KEY environment variable.
+    private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      xxxxx
+      xxxxx
+      xxxxx
+      -----END RSA PRIVATE KEY-----
+
+# Options for application behavior
+options:
+  # The path within repositories to find the tfe-plan.yml file
+  config_path: .tfe-plan.yml
+  # The context prefix for status checks created by the bot
+  status_check_context: TFE
+  # The user name of the application as registered with GitHub. Note that
+  # GitHub will lowercase the application name and replace forbidden characters
+  # (including spaces) with hyphens, so if the application name is "TFE Plan Bot"
+  # in the GitHub UI, this value should be set to "tfe-plan-bot".
+  app_name: tfe-plan-bot
+
+# Options for connecting to TFE
+tfe:
+  # The address of the TFE server. Can also be set by the TFE_ADDRESS
+  # environment variable.
+  address: "https://app.terraform.io"
+  # The organizations that this bot can access, with their corresponding token.
+  # Can also be set by the TFE_ORGANIZATIONS environment variables. The format
+  # is name:token[,name:token,...]
+  organizations:
+    - name: "organization"
+      token: "token"

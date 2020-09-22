@@ -1,0 +1,5 @@
+dist/
+.vscode/
+
+# default config location
+config/tfe-plan-bot.yml

@@ -1,0 +1,27 @@
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    ldflags:
+     - -s -w -X github.com/G-Research/tfe-plan-bot/version.version={{.Version}}
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+archives:
+  - format: binary
+dockers:
+  - image_templates:
+      - "gresearch/tfe-plan-bot:{{ .Tag }}"
+      - "gresearch/tfe-plan-bot:v{{ .Major }}"
+      - "gresearch/tfe-plan-bot:v{{ .Major }}.{{ .Minor }}"
+      - "gresearch/tfe-plan-bot:latest"
+    extra_files:
+    - config/tfe-plan-bot.example.yml
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256

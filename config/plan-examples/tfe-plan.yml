@@ -1,0 +1,24 @@
+workspaces:
+  - organization: org
+    name: name
+    #branch: main
+    #working_directory: working_directory
+    policy:
+      approval:
+        - lgtm
+
+approval_rules:
+  - name: lgtm
+    options:
+      invalidate_on_push: true
+      request_review:
+        enabled: true
+      methods:
+        comments:
+          - "lgtm"
+          - "LGTM"
+        github_review: false
+    requires:
+      count: 1
+      teams:
+        - "org/tf-approvers"
