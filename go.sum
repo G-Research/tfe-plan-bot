@@ -134,8 +134,8 @@ github.com/palantir/go-githubapp v0.5.0 h1:mAdLgaaNV0zrqSv1q0zpJbKq65H92uIrAlSwR
 github.com/palantir/go-githubapp v0.5.0/go.mod h1:/Xm5h66uEBX24An2Ln8H6Rk44z8uwk4E6m4gNrPadjQ=
 github.com/palantir/go-githubapp v0.5.1 h1:KwcbWsAkFHVuo7oa0f4LSYqVpYo0mFRsYoD3MbzPmXM=
 github.com/palantir/go-githubapp v0.5.1/go.mod h1:/Xm5h66uEBX24An2Ln8H6Rk44z8uwk4E6m4gNrPadjQ=
-github.com/palantir/policy-bot v1.19.1 h1:dFXIjhTVIHG1x9TV3xwZOdKg8RZGrqCjy5YK1qkaLjs=
-github.com/palantir/policy-bot v1.19.1/go.mod h1:OkUOcGRL1LUqPrtj26y4ev5JbGYb+PS74od5SATLc7s=
+github.com/palantir/policy-bot v1.17.2 h1:gnwEGXgbJOYDuelNxcbe0PQaOYNWxg00YSaMxhWTVLk=
+github.com/palantir/policy-bot v1.17.2/go.mod h1:3OvIg+8yCL9NbFeqUjX6dx5gs+SruDXlRerM/x433cQ=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
