@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod download
+    - sh -c "docker run --rm alpine tar -C / -c tmp > tmp.tar"
 builds:
   - env:
       - CGO_ENABLED=0
@@ -22,6 +23,7 @@ dockers:
       - "gresearch/tfe-plan-bot:latest"
     extra_files:
     - config/tfe-plan-bot.example.yml
+    - tmp.tar
 checksum:
   name_template: checksums.txt
   algorithm: sha256
