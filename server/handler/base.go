@@ -222,7 +222,7 @@ func (b *Base) EvaluateWorkspace(ctx context.Context, prctx pull.Context, reques
 	case plan.StatusPlanCreated:
 		statusState = "pending"
 		runID = result.RunID
-		logger.Debug().Msgf("Plan created for workspace %s")
+		logger.Info().Msgf("Plan created for workspace %s", wkcfg)
 		pc.MonitorRun(context.Background(), b, runID)
 	case plan.StatusPlanPending:
 		logger.Debug().Msgf("Workspace %s already has a plan: %s", wkcfg, result.RunID)
