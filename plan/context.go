@@ -235,6 +235,10 @@ func (pc *Context) branch() string {
 	return pc.wkcfg.Branch
 }
 
+func (pc *Context) workingDirectory() string {
+	return path.Clean(pc.wkcfg.WorkingDirectory)
+}
+
 func (pc *Context) runMessage() string {
 	_, head := pc.prctx.Branches()
 	return fmt.Sprintf("PR #%d: %q (%s@%s)",
@@ -252,16 +256,14 @@ func (pc *Context) matchPR() (bool, error) {
 		return false, nil
 	}
 
-	if pc.wkcfg.WorkingDirectory != "" {
+	if pc.workingDirectory() != "." {
 		changedFiles, err := pc.prctx.ChangedFiles()
 		if err != nil {
 			return false, errors.Wrap(err, "failed to get changed files")
 		}
 
-		dir := path.Clean(pc.wkcfg.WorkingDirectory) + "/"
-
 		for _, file := range changedFiles {
-			if strings.HasPrefix(file.Filename, dir) {
+			if strings.HasPrefix(file.Filename, pc.workingDirectory()+"/") {
 				return true, nil
 			}
 		}
@@ -283,7 +285,7 @@ func (pc *Context) validate(wk *tfe.Workspace) error {
 			pc.wkcfg.Branch, wk.VCSRepo.Branch)
 	}
 
-	if pc.wkcfg.WorkingDirectory != wk.WorkingDirectory {
+	if pc.workingDirectory() != path.Clean(wk.WorkingDirectory) {
 		return errors.Errorf("workspace working directory mismatch: config=%q tfe=%q",
 			pc.wkcfg.WorkingDirectory, wk.WorkingDirectory)
 	}
