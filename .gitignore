@@ -1,5 +1,8 @@
 dist/
 .vscode/
 
+# temporary tarball for proper /tmp permissions
+tmp.tar
+
 # default config location
 config/tfe-plan-bot.yml
