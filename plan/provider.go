@@ -40,7 +40,7 @@ func (c *ClientProviderConfig) SetValuesFromEnv() {
 	}
 
 	if orgs, ok := os.LookupEnv("TFE_ORGANIZATIONS"); ok {
-		for _, org := range strings.Split(orgs, ",") {
+		for _, org := range strings.Split(strings.TrimRight(orgs, " \t\r\n"), ",") {
 			split := strings.SplitN(org, ":", 2)
 			c.Organizations = append(c.Organizations, OrganizationConfig{
 				Name:  split[0],
