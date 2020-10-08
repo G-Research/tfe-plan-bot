@@ -195,7 +195,7 @@ func (b *Base) EvaluateWorkspace(ctx context.Context, prctx pull.Context, reques
 	pc, err := plan.NewContext(ctx, wkcfg, prctx, fetchedConfig.Config, b.statusCheckContext(wkcfg), client, b.TFEClientProvider)
 	if err != nil {
 		statusMessage := fmt.Sprintf("Invalid workspace %s defined by %s", wkcfg, fetchedConfig)
-		logger.Debug().Err(err).Msg(statusMessage)
+		logger.Warn().Err(err).Msg(statusMessage)
 		err := b.PostStatus(ctx, prctx, wkcfg, "", client, "error", statusMessage)
 		return err
 	}

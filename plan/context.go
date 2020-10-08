@@ -181,6 +181,9 @@ func (pc *Context) Evaluate() Result {
 func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID string) {
 	go func() {
 		logger := zerolog.Ctx(pc.ctx)
+		ctx = logger.WithContext(ctx)
+
+		logger.Debug().Msgf("Started monitoring run with ID %s", runID)
 
 		for {
 			select {
@@ -222,7 +225,7 @@ func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID st
 						continue
 					}
 
-					logger.Debug().Msgf("%s: %s", state, message)
+					logger.Info().Msgf("Plan finished with %s: %s", state, message)
 					poster.PostStatus(ctx, pc.prctx, pc.wkcfg, runID, pc.ghClient, state, message)
 					return
 				}
