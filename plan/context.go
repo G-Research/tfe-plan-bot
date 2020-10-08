@@ -94,6 +94,9 @@ func (pc *Context) Evaluate() Result {
 	if polRes.Error != nil {
 		return Result{Error: errors.Wrap(polRes.Error, "failed to evaluate policy")}
 	}
+
+	defer pc.postCommentIfNeeded()
+
 	switch polRes.Status {
 	case common.StatusApproved:
 		logger.Debug().Msg("policy approved")
@@ -272,6 +275,48 @@ func (pc *Context) matchPR() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (pc *Context) shouldComment() (bool, error) {
+	if pc.wkcfg.Comment == "" {
+		return false, nil
+	}
+
+	comments, err := pc.prctx.Comments()
+	if err != nil {
+		return false, errors.Wrap(err, "failed to read comments")
+	}
+
+	for _, comment := range comments {
+		if comment.Body == pc.wkcfg.Comment {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+func (pc *Context) postCommentIfNeeded() {
+	logger := zerolog.Ctx(pc.ctx)
+
+	shouldComment, err := pc.shouldComment()
+	if err != nil {
+		logger.Warn().Err(err).Msg("could not determine whether commenting is needed")
+		return
+	}
+	if !shouldComment {
+		logger.Debug().Msg("no need to comment")
+		return
+	}
+
+	if _, _, err := pc.ghClient.Issues.CreateComment(pc.ctx, pc.prctx.RepositoryOwner(), pc.prctx.RepositoryName(), pc.prctx.Number(), &github.IssueComment{
+		Body: github.String(pc.wkcfg.Comment),
+	}); err != nil {
+		logger.Warn().Err(err).Msg("error posting comment")
+		return
+	}
+
+	logger.Info().Msg("posted comment")
 }
 
 func (pc *Context) validate(wk *tfe.Workspace) error {
