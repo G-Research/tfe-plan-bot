@@ -6,6 +6,9 @@ workspaces:
     policy:
       approval:
         - lgtm
+      disapproval:
+        requires:
+          - "org/tf-approvers"
 
 approval_rules:
   - name: lgtm
