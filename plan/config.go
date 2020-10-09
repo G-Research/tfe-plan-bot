@@ -15,6 +15,8 @@
 package plan
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/palantir/policy-bot/policy"
 	"github.com/palantir/policy-bot/policy/approval"
 )
@@ -22,6 +24,9 @@ import (
 type Config struct {
 	Workspaces    []WorkspaceConfig `yaml:"workspaces"`
 	ApprovalRules []*approval.Rule  `yaml:"approval_rules"`
+	Comments      []Comment         `yaml:"comments"`
+
+	commentsParsed bool
 }
 
 type WorkspaceConfig struct {
@@ -30,8 +35,43 @@ type WorkspaceConfig struct {
 	WorkingDirectory string        `yaml:"working_directory"`
 	Branch           string        `yaml:"branch"`
 	Policy           policy.Policy `yaml:"policy"`
+	Comment          string        `yaml:"comment"`
+}
+
+type Comment struct {
+	Name    string `yaml:"name"`
+	Content string `yaml:"content"`
 }
 
 func (w WorkspaceConfig) String() string {
 	return w.Organization + "/" + w.Name
+}
+
+func (c *Config) ParseComments() error {
+	if c.commentsParsed {
+		return nil
+	}
+
+	commentsByName := make(map[string]string)
+	for _, comment := range c.Comments {
+		commentsByName[comment.Name] = comment.Content
+	}
+
+	for i, w := range c.Workspaces {
+		if w.Comment != "" {
+			if comment, ok := commentsByName[w.Comment]; ok {
+				c.Workspaces[i].Comment = comment
+			} else {
+				names := make([]string, 0, len(commentsByName))
+				for n := range commentsByName {
+					names = append(names, n)
+				}
+				return errors.Errorf("workspace references undefined comment %q, allowed values: %v", w.Comment, names)
+			}
+		}
+	}
+
+	c.commentsParsed = true
+
+	return nil
 }

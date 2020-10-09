@@ -97,6 +97,11 @@ func (cf *ConfigFetcher) ConfigForPR(ctx context.Context, prctx pull.Context, cl
 		return fc, nil
 	}
 
+	if err := config.ParseComments(); err != nil {
+		fc.Error = err
+		return fc, nil
+	}
+
 	fc.Config = config
 	return fc, nil
 }
