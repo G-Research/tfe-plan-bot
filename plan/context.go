@@ -32,7 +32,10 @@ import (
 	"github.com/G-Research/tfe-plan-bot/pull"
 )
 
-const LogKeyTFEWorkspace = "tfe_workspace"
+const (
+	LogKeyTFEWorkspace = "tfe_workspace"
+	LogKeyTFERun       = "tfe_run"
+)
 
 type Context struct {
 	ctx       context.Context
@@ -180,20 +183,20 @@ func (pc *Context) Evaluate() Result {
 
 func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID string) {
 	go func() {
-		logger := zerolog.Ctx(pc.ctx)
+		logger := zerolog.Ctx(pc.ctx).With().Str(LogKeyTFERun, runID).Logger()
 		ctx = logger.WithContext(ctx)
 
-		logger.Debug().Msgf("Started monitoring run with ID %s", runID)
+		logger.Debug().Msg("Started monitoring run")
 
 		for {
 			select {
 			case <-ctx.Done():
-				logger.Debug().Msgf("Monitoring stopped for run with ID %s", runID)
+				logger.Debug().Err(ctx.Err()).Msg("Monitoring stopped")
 				return
 			case <-time.After(500 * time.Millisecond):
 				r, err := pc.tfeClient.Runs.Read(ctx, runID)
 				if err != nil {
-					logger.Warn().Err(err).Msgf("Error reading run with ID %s", runID)
+					logger.Warn().Err(err).Msg("Error reading run")
 				} else {
 					var state string
 					var message string
@@ -226,7 +229,9 @@ func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID st
 					}
 
 					logger.Info().Msgf("Plan finished with %s: %s", state, message)
-					poster.PostStatus(ctx, pc.prctx, pc.wkcfg, runID, pc.ghClient, state, message)
+					if err := poster.PostStatus(ctx, pc.prctx, pc.wkcfg, runID, pc.ghClient, state, message); err != nil {
+						logger.Warn().Err(err).Msg("Error posting status")
+					}
 					return
 				}
 			}
