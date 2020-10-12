@@ -114,14 +114,14 @@ func (cf *ConfigFetcher) fetchConfig(ctx context.Context, client *github.Client,
 		return nil, err
 	}
 
-	logger.Debug().Msgf("found plan config in %s/%s@%s", owner, repo, ref)
+	logger.Debug().Msgf("Found plan config in %s/%s@%s", owner, repo, ref)
 	return configBytes, nil
 }
 
 // fetchConfigContents returns a nil slice if there is no policy
 func (cf *ConfigFetcher) fetchConfigContents(ctx context.Context, client *github.Client, owner, repo, ref, path string) ([]byte, error) {
 	logger := zerolog.Ctx(ctx)
-	logger.Debug().Msgf("attempting to fetch policy definition for %s/%s@%s/%s", owner, repo, ref, path)
+	logger.Debug().Msgf("Attempting to fetch policy definition for %s/%s@%s/%s", owner, repo, ref, path)
 
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
@@ -142,7 +142,7 @@ func (cf *ConfigFetcher) fetchConfigContents(ctx context.Context, client *github
 
 			defer func() {
 				if cerr := reader.Close(); cerr != nil {
-					logger.Error().Err(cerr).Msgf("failed to close reader for %s/%s@%s/%s", owner, repo, ref, path)
+					logger.Error().Err(cerr).Msgf("Failed to close reader for %s/%s@%s/%s", owner, repo, ref, path)
 				}
 			}()
 			downloadedContent, readErr := ioutil.ReadAll(reader)

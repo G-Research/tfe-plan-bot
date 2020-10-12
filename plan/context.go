@@ -102,7 +102,7 @@ func (pc *Context) Evaluate() Result {
 
 	switch polRes.Status {
 	case common.StatusApproved:
-		logger.Debug().Msg("policy approved")
+		logger.Debug().Msg("Policy approved")
 	case common.StatusSkipped:
 		return Result{Error: errors.New("all policy rules were skipped")}
 	case common.StatusPending:
@@ -172,7 +172,7 @@ func (pc *Context) Evaluate() Result {
 		return Result{Error: errors.Wrap(err, "failed to create speculative plan")}
 	}
 
-	logger.Debug().Msgf("speculative plan created with ID %s", run.ID)
+	logger.Debug().Msgf("Speculative plan created with ID %s", run.ID)
 	return Result{
 		Status:       StatusPlanCreated,
 		Description:  "Terraform plan: pending",
@@ -309,22 +309,22 @@ func (pc *Context) postCommentIfNeeded() {
 
 	shouldComment, err := pc.shouldComment()
 	if err != nil {
-		logger.Warn().Err(err).Msg("could not determine whether commenting is needed")
+		logger.Warn().Err(err).Msg("Could not determine whether commenting is needed")
 		return
 	}
 	if !shouldComment {
-		logger.Debug().Msg("no need to comment")
+		logger.Debug().Msg("No need to comment")
 		return
 	}
 
 	if _, _, err := pc.ghClient.Issues.CreateComment(pc.ctx, pc.prctx.RepositoryOwner(), pc.prctx.RepositoryName(), pc.prctx.Number(), &github.IssueComment{
 		Body: github.String(pc.wkcfg.Comment),
 	}); err != nil {
-		logger.Warn().Err(err).Msg("error posting comment")
+		logger.Warn().Err(err).Msg("Error posting comment")
 		return
 	}
 
-	logger.Info().Msg("posted comment")
+	logger.Info().Msg("Posted comment")
 }
 
 func (pc *Context) validate(wk *tfe.Workspace) error {

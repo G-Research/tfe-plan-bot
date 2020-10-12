@@ -154,12 +154,12 @@ func (b *Base) EvaluateFetchedConfig(ctx context.Context, prctx pull.Context, re
 	logger := zerolog.Ctx(ctx)
 
 	if fetchedConfig.Missing() {
-		logger.Debug().Msgf("policy does not exist: %s", fetchedConfig)
+		logger.Debug().Msgf("Policy does not exist: %s", fetchedConfig)
 		return nil
 	}
 
 	if fetchedConfig.Invalid() {
-		logger.Warn().Err(fetchedConfig.Error).Msgf("invalid policy: %s", fetchedConfig)
+		logger.Warn().Err(fetchedConfig.Error).Msgf("Invalid policy: %s", fetchedConfig)
 		return nil
 	}
 
@@ -175,7 +175,7 @@ func (b *Base) EvaluateFetchedConfig(ctx context.Context, prctx pull.Context, re
 
 			if err := b.EvaluateWorkspace(ctx, prctx, requestReviews, client, fetchedConfig, wkcfg); err != nil {
 				atomic.AddUint32(&evaluationFailures, 1)
-				logger.Error().Err(err).Msgf("failed to evaluate workspace %s", wkcfg)
+				logger.Error().Err(err).Msgf("Failed to evaluate workspace %s", wkcfg)
 			}
 		}()
 	}
