@@ -32,7 +32,10 @@ import (
 	"github.com/G-Research/tfe-plan-bot/pull"
 )
 
-const LogKeyTFEWorkspace = "tfe_workspace"
+const (
+	LogKeyTFEWorkspace = "tfe_workspace"
+	LogKeyTFERun       = "tfe_run"
+)
 
 type Context struct {
 	ctx       context.Context
@@ -99,7 +102,7 @@ func (pc *Context) Evaluate() Result {
 
 	switch polRes.Status {
 	case common.StatusApproved:
-		logger.Debug().Msg("policy approved")
+		logger.Debug().Msg("Policy approved")
 	case common.StatusSkipped:
 		return Result{Error: errors.New("all policy rules were skipped")}
 	case common.StatusPending:
@@ -169,7 +172,7 @@ func (pc *Context) Evaluate() Result {
 		return Result{Error: errors.Wrap(err, "failed to create speculative plan")}
 	}
 
-	logger.Debug().Msgf("speculative plan created with ID %s", run.ID)
+	logger.Debug().Msgf("Speculative plan created with ID %s", run.ID)
 	return Result{
 		Status:       StatusPlanCreated,
 		Description:  "Terraform plan: pending",
@@ -180,17 +183,20 @@ func (pc *Context) Evaluate() Result {
 
 func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID string) {
 	go func() {
-		logger := zerolog.Ctx(pc.ctx)
+		logger := zerolog.Ctx(pc.ctx).With().Str(LogKeyTFERun, runID).Logger()
+		ctx = logger.WithContext(ctx)
+
+		logger.Debug().Msg("Started monitoring run")
 
 		for {
 			select {
 			case <-ctx.Done():
-				logger.Debug().Msgf("Monitoring stopped for run with ID %s", runID)
+				logger.Debug().Err(ctx.Err()).Msg("Monitoring stopped")
 				return
 			case <-time.After(500 * time.Millisecond):
 				r, err := pc.tfeClient.Runs.Read(ctx, runID)
 				if err != nil {
-					logger.Warn().Err(err).Msgf("Error reading run with ID %s", runID)
+					logger.Warn().Err(err).Msg("Error reading run")
 				} else {
 					var state string
 					var message string
@@ -222,8 +228,10 @@ func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID st
 						continue
 					}
 
-					logger.Debug().Msgf("%s: %s", state, message)
-					poster.PostStatus(ctx, pc.prctx, pc.wkcfg, runID, pc.ghClient, state, message)
+					logger.Info().Msgf("Plan finished with %s: %s", state, message)
+					if err := poster.PostStatus(ctx, pc.prctx, pc.wkcfg, runID, pc.ghClient, state, message); err != nil {
+						logger.Warn().Err(err).Msg("Error posting status")
+					}
 					return
 				}
 			}
@@ -301,22 +309,22 @@ func (pc *Context) postCommentIfNeeded() {
 
 	shouldComment, err := pc.shouldComment()
 	if err != nil {
-		logger.Warn().Err(err).Msg("could not determine whether commenting is needed")
+		logger.Warn().Err(err).Msg("Could not determine whether commenting is needed")
 		return
 	}
 	if !shouldComment {
-		logger.Debug().Msg("no need to comment")
+		logger.Debug().Msg("No need to comment")
 		return
 	}
 
 	if _, _, err := pc.ghClient.Issues.CreateComment(pc.ctx, pc.prctx.RepositoryOwner(), pc.prctx.RepositoryName(), pc.prctx.Number(), &github.IssueComment{
 		Body: github.String(pc.wkcfg.Comment),
 	}); err != nil {
-		logger.Warn().Err(err).Msg("error posting comment")
+		logger.Warn().Err(err).Msg("Error posting comment")
 		return
 	}
 
-	logger.Info().Msg("posted comment")
+	logger.Info().Msg("Posted comment")
 }
 
 func (pc *Context) validate(wk *tfe.Workspace) error {
