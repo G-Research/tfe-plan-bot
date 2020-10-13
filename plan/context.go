@@ -218,11 +218,15 @@ func (pc *Context) MonitorRun(ctx context.Context, poster StatusPoster, runID st
 							logger.Warn().Err(err).Msgf("Error reading plan with ID %s", r.Plan.ID)
 							message = "Terraform plan: successful."
 						} else {
-							message = fmt.Sprintf("Terraform plan: %d to add, %d to change, %d to destroy.",
-								p.ResourceAdditions,
-								p.ResourceChanges,
-								p.ResourceDestructions,
-							)
+							if p.HasChanges {
+								message = fmt.Sprintf("Terraform plan: %d to add, %d to change, %d to destroy.",
+									p.ResourceAdditions,
+									p.ResourceChanges,
+									p.ResourceDestructions,
+								)
+							} else {
+								message = "Terraform plan has no changes"
+							}
 						}
 					default:
 						continue
