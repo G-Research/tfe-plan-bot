@@ -36,6 +36,7 @@ type WorkspaceConfig struct {
 	Branch           string        `yaml:"branch"`
 	Policy           policy.Policy `yaml:"policy"`
 	Comment          string        `yaml:"comment"`
+	ShowSkipped      bool          `yaml:"show_skipped"`
 }
 
 type Comment struct {

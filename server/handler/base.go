@@ -214,7 +214,10 @@ func (b *Base) EvaluateWorkspace(ctx context.Context, prctx pull.Context, reques
 	switch result.Status {
 	case plan.StatusSkipped:
 		logger.Debug().Msgf("Workspace %s skipped", wkcfg)
-		return nil
+		if !wkcfg.ShowSkipped {
+			return nil
+		}
+		statusState = "success"
 	case plan.StatusPolicyPending:
 		statusState = "pending"
 	case plan.StatusPolicyDisapproved:

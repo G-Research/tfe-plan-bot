@@ -90,7 +90,7 @@ func (pc *Context) Evaluate() Result {
 		return Result{Error: err}
 	}
 	if !ok {
-		return Result{Status: StatusSkipped}
+		return Result{Status: StatusSkipped, Description: "Run not triggered"}
 	}
 
 	polRes := pc.evaluator.Evaluate(pc.ctx, pc.prctx)
