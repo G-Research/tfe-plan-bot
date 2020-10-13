@@ -347,6 +347,10 @@ func (pc *Context) validate(wk *tfe.Workspace) error {
 			pc.wkcfg.WorkingDirectory, wk.WorkingDirectory)
 	}
 
+	if wk.SpeculativeEnabled {
+		return errors.New("workspace has speculative plans enabled")
+	}
+
 	return nil
 }
 
