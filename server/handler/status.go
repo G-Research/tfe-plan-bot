@@ -68,7 +68,7 @@ func (h *Status) processOwn(ctx context.Context, event github.StatusEvent) error
 	ctx, logger := githubapp.PrepareRepoContext(ctx, installationID, repo)
 	sender := event.GetSender()
 
-	if sender.GetLogin() == h.PullOpts.AppName+"[bot]" {
+	if sender.GetLogin() == h.AppName+"[bot]" {
 		return nil
 	}
 
