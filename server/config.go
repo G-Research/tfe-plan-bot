@@ -67,6 +67,7 @@ func ParseConfig(bytes []byte) (*Config, error) {
 	}
 
 	c.Options.FillDefaults()
+	c.Server.SetValuesFromEnv("TFEPLANBOT_")
 	c.Github.SetValuesFromEnv("")
 	c.TFE.SetValuesFromEnv()
 
