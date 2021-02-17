@@ -27,9 +27,6 @@ type Context interface {
 	// request targets.
 	DefaultBranch() string
 
-	// Title returns the title of the pull request.
-	Title() string
-
 	// DownloadCode downloads the code to a temporary directory and returns its
 	// path and a cleanup function.
 	DownloadCode() (path string, cleanup func(), err error)
