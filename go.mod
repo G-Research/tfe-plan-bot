@@ -14,11 +14,11 @@ require (
 	github.com/juju/testing v0.0.0-20200706033705-4c23f9c453cd // indirect
 	github.com/palantir/go-baseapp v0.2.1
 	github.com/palantir/go-githubapp v0.5.1
-	github.com/palantir/policy-bot v1.17.2
+	github.com/palantir/policy-bot v1.19.2
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.20.0
 	github.com/shurcooL/githubv4 v0.0.0-20200915023059-bc5e4feb2971
-	github.com/spf13/cobra v1.0.0
+	github.com/spf13/cobra v1.1.1
 	goji.io v2.0.2+incompatible
 	gopkg.in/yaml.v2 v2.3.0
 )
