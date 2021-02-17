@@ -46,8 +46,8 @@ func (s EvaluationStatus) String() string {
 }
 
 type Result struct {
-	Description string
-	Status      EvaluationStatus
+	StatusDescription string
+	Status            EvaluationStatus
 
 	Error error
 

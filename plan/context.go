@@ -82,6 +82,10 @@ func NewContext(ctx context.Context, wkcfg WorkspaceConfig, prctx pull.Context, 
 	}, nil
 }
 
+func (pc *Context) Trigger() common.Trigger {
+	return pc.evaluator.Trigger()
+}
+
 func (pc *Context) Evaluate() Result {
 	logger := zerolog.Ctx(pc.ctx)
 
@@ -90,7 +94,7 @@ func (pc *Context) Evaluate() Result {
 		return Result{Error: err}
 	}
 	if !ok {
-		return Result{Status: StatusSkipped, Description: "Run not triggered"}
+		return Result{Status: StatusSkipped, StatusDescription: "Run not triggered"}
 	}
 
 	polRes := pc.evaluator.Evaluate(pc.ctx, pc.prctx)
@@ -106,9 +110,9 @@ func (pc *Context) Evaluate() Result {
 	case common.StatusSkipped:
 		return Result{Error: errors.New("all policy rules were skipped")}
 	case common.StatusPending:
-		return Result{Status: StatusPolicyPending, Description: polRes.Description, PolicyResult: polRes}
+		return Result{Status: StatusPolicyPending, StatusDescription: polRes.StatusDescription, PolicyResult: polRes}
 	case common.StatusDisapproved:
-		return Result{Status: StatusPolicyDisapproved, Description: polRes.Description, PolicyResult: polRes}
+		return Result{Status: StatusPolicyDisapproved, StatusDescription: polRes.StatusDescription, PolicyResult: polRes}
 	default:
 		return Result{Error: errors.Errorf("policy evaluation resulted in unexpected state: %s", polRes.Status)}
 	}
@@ -174,10 +178,10 @@ func (pc *Context) Evaluate() Result {
 
 	logger.Debug().Msgf("Speculative plan created with ID %s", run.ID)
 	return Result{
-		Status:       StatusPlanCreated,
-		Description:  "Terraform plan: pending",
-		PolicyResult: polRes,
-		RunID:        run.ID,
+		Status:            StatusPlanCreated,
+		StatusDescription: "Terraform plan: pending",
+		PolicyResult:      polRes,
+		RunID:             run.ID,
 	}
 }
 

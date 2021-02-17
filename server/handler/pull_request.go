@@ -21,6 +21,7 @@ import (
 
 	"github.com/google/go-github/v32/github"
 	"github.com/palantir/go-githubapp/githubapp"
+	"github.com/palantir/policy-bot/policy/common"
 	"github.com/pkg/errors"
 
 	"github.com/G-Research/tfe-plan-bot/pull"
@@ -43,22 +44,24 @@ func (h *PullRequest) Handle(ctx context.Context, eventType, deliveryID string, 
 	installationID := githubapp.GetInstallationIDFromEvent(&event)
 	ctx, _ = h.PreparePRContext(ctx, installationID, event.GetPullRequest())
 
+	var t common.Trigger
 	switch event.GetAction() {
 	case "opened", "reopened", "ready_for_review":
-		return h.Evaluate(ctx, installationID, true, pull.Locator{
-			Owner:  event.GetRepo().GetOwner().GetLogin(),
-			Repo:   event.GetRepo().GetName(),
-			Number: event.GetPullRequest().GetNumber(),
-			Value:  event.GetPullRequest(),
-		})
-	case "synchronize", "edited", "labeled", "unlabeled":
-		return h.Evaluate(ctx, installationID, false, pull.Locator{
-			Owner:  event.GetRepo().GetOwner().GetLogin(),
-			Repo:   event.GetRepo().GetName(),
-			Number: event.GetPullRequest().GetNumber(),
-			Value:  event.GetPullRequest(),
-		})
+		t = common.TriggerCommit | common.TriggerPullRequest
+	case "synchronize":
+		t = common.TriggerCommit
+	case "edited":
+		t = common.TriggerPullRequest
+	case "labeled", "unlabeled":
+		t = common.TriggerLabel
+	default:
+		return nil
 	}
 
-	return nil
+	return h.Evaluate(ctx, installationID, t, pull.Locator{
+		Owner:  event.GetRepo().GetOwner().GetLogin(),
+		Repo:   event.GetRepo().GetName(),
+		Number: event.GetPullRequest().GetNumber(),
+		Value:  event.GetPullRequest(),
+	})
 }
