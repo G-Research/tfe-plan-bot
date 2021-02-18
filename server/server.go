@@ -16,6 +16,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -63,7 +64,7 @@ func New(c *Config) (*Server, error) {
 		githubTimeout = 10 * time.Second
 	}
 
-	userAgent := fmt.Sprintf("%s/%s", c.Options.AppName, version.GetVersion())
+	userAgent := fmt.Sprintf("tfe-plan-bot/%s", version.GetVersion())
 	cc, err := githubapp.NewDefaultCachingClientCreator(
 		c.Github,
 		githubapp.WithClientUserAgent(userAgent),
@@ -83,6 +84,11 @@ func New(c *Config) (*Server, error) {
 	appClient, err := cc.NewAppClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize Github app client")
+	}
+
+	app, _, err := appClient.Apps.Get(context.Background(), "")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get configured GitHub app")
 	}
 
 	// TODO(jgiannuzzi) use ClientLogging with a different message than github_request
@@ -114,6 +120,8 @@ func New(c *Config) (*Server, error) {
 		ConfigFetcher: &handler.ConfigFetcher{
 			PolicyPath: c.Options.ConfigPath,
 		},
+
+		AppName: app.GetSlug(),
 	}
 
 	queueSize := c.Workers.QueueSize

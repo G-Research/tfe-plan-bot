@@ -40,7 +40,6 @@ import (
 const (
 	DefaultPolicyPath         = ".tfe-plan.yml"
 	DefaultStatusCheckContext = "TFE"
-	DefaultAppName            = "tfe-plan-bot"
 
 	LogKeyGitHubSHA = "github_sha"
 )
@@ -49,20 +48,27 @@ type Base struct {
 	githubapp.ClientCreator
 
 	Installations     githubapp.InstallationsService
-	PullOpts          *PullEvaluationOptions
 	ConfigFetcher     *ConfigFetcher
 	BaseConfig        *baseapp.HTTPConfig
 	TFEClientProvider *plan.ClientProvider
 	HTTPClient        *http.Client
+	PullOpts          *PullEvaluationOptions
+
+	AppName string
 }
 
 type PullEvaluationOptions struct {
-	AppName    string `yaml:"app_name"`
 	ConfigPath string `yaml:"config_path"`
 
 	// StatusCheckContext will be used to create the status context. It will be used in the following
 	// pattern: <StatusCheckContext>/<TFE Organization Name>/<TFE Workspace Name>
 	StatusCheckContext string `yaml:"status_check_context"`
+
+	// This field is unused but is left to avoid breaking configuration files:
+	// yaml.UnmarshalStrict returns an error for unmapped fields
+	//
+	// TODO(jgiannuzzi): remove in version 1.0
+	Deprecated_AppName string `yaml:"app_name"`
 }
 
 func (p *PullEvaluationOptions) FillDefaults() {
@@ -72,10 +78,6 @@ func (p *PullEvaluationOptions) FillDefaults() {
 
 	if p.StatusCheckContext == "" {
 		p.StatusCheckContext = DefaultStatusCheckContext
-	}
-
-	if p.AppName == "" {
-		p.AppName = DefaultAppName
 	}
 }
 

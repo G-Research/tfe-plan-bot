@@ -73,11 +73,6 @@ options:
   config_path: .tfe-plan.yml
   # The context prefix for status checks created by the bot
   status_check_context: TFE
-  # The user name of the application as registered with GitHub. Note that
-  # GitHub will lowercase the application name and replace forbidden characters
-  # (including spaces) with hyphens, so if the application name is "TFE Plan Bot"
-  # in the GitHub UI, this value should be set to "tfe-plan-bot".
-  app_name: tfe-plan-bot
 
 # Options for connecting to TFE
 tfe:
