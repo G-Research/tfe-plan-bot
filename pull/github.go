@@ -39,7 +39,6 @@ type Locator pull.Locator
 func (loc Locator) IsComplete() bool {
 	switch {
 	case loc.Value == nil:
-	case loc.Value.GetTitle() == "":
 	case loc.Value.GetBase().GetRepo().GetDefaultBranch() == "":
 	default:
 		return true
@@ -66,7 +65,6 @@ func (loc Locator) toV4(ctx context.Context, client *githubv4.Client) (*v4PullRe
 	}
 
 	var v4 v4PullRequest
-	v4.Title = loc.Value.GetTitle()
 	v4.BaseRepository.DefaultBranchRef.Name = loc.Value.GetBase().GetRepo().GetDefaultBranch()
 	return &v4, nil
 }
@@ -98,10 +96,6 @@ func NewGitHubContext(ctx context.Context, mbrCtx pull.MembershipContext, client
 		pr:         pr,
 		httpClient: httpClient,
 	}, nil
-}
-
-func (ghc *GitHubContext) Title() string {
-	return ghc.pr.Title
 }
 
 func (ghc *GitHubContext) DefaultBranch() string {
@@ -180,7 +174,6 @@ func shiftPath(path string) string {
 }
 
 type v4PullRequest struct {
-	Title          string
 	BaseRepository struct {
 		DefaultBranchRef struct {
 			Name string
