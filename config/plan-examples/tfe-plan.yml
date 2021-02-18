@@ -13,6 +13,7 @@ workspaces:
 
 approval_rules:
   - name: lgtm
+    description: Approvers commented LGTM
     options:
       invalidate_on_push: true
       request_review:

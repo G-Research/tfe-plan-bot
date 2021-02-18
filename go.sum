@@ -196,8 +196,8 @@ github.com/palantir/go-githubapp v0.5.0 h1:mAdLgaaNV0zrqSv1q0zpJbKq65H92uIrAlSwR
 github.com/palantir/go-githubapp v0.5.0/go.mod h1:/Xm5h66uEBX24An2Ln8H6Rk44z8uwk4E6m4gNrPadjQ=
 github.com/palantir/go-githubapp v0.5.1 h1:KwcbWsAkFHVuo7oa0f4LSYqVpYo0mFRsYoD3MbzPmXM=
 github.com/palantir/go-githubapp v0.5.1/go.mod h1:/Xm5h66uEBX24An2Ln8H6Rk44z8uwk4E6m4gNrPadjQ=
-github.com/palantir/policy-bot v1.19.2 h1:leckEmmHTpoLeZmKs24DbeH+kW1OErx3RcBCGQuTn6o=
-github.com/palantir/policy-bot v1.19.2/go.mod h1:b2kT6HrvEtazyK/WiXM8F38ul1ug0/NIh+ofPbBFUWw=
+github.com/palantir/policy-bot v1.20.0 h1:MN/ddgdtIiD0Pql1koPbeY5gHkoXDpUO6sGkVSB41U0=
+github.com/palantir/policy-bot v1.20.0/go.mod h1:b2kT6HrvEtazyK/WiXM8F38ul1ug0/NIh+ofPbBFUWw=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

@@ -21,6 +21,7 @@ import (
 
 	"github.com/google/go-github/v32/github"
 	"github.com/palantir/go-githubapp/githubapp"
+	"github.com/palantir/policy-bot/policy/common"
 	"github.com/pkg/errors"
 
 	"github.com/G-Research/tfe-plan-bot/pull"
@@ -56,7 +57,7 @@ func (h *CheckRun) Handle(ctx context.Context, eventType, deliveryID string, pay
 		// of the event, but I can't find confirmation of that in the GitHub
 		// docs. The PR object is a minimal version that is missing the "state"
 		// field, so we can't check without loading the full object.
-		if err := h.Evaluate(ctx, installationID, false, pull.Locator{
+		if err := h.Evaluate(ctx, installationID, common.TriggerStatus, pull.Locator{
 			Owner:  ownerName,
 			Repo:   repoName,
 			Number: pr.GetNumber(),

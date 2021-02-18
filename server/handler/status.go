@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/go-github/v32/github"
 	"github.com/palantir/go-githubapp/githubapp"
+	"github.com/palantir/policy-bot/policy/common"
 	"github.com/pkg/errors"
 
 	"github.com/G-Research/tfe-plan-bot/pull"
@@ -132,7 +133,7 @@ func (h *Status) processOthers(ctx context.Context, event github.StatusEvent) er
 	evaluationFailures := 0
 	for _, pr := range prs {
 		if pr.GetState() == "open" {
-			err = h.Evaluate(ctx, installationID, false, pull.Locator{
+			err = h.Evaluate(ctx, installationID, common.TriggerStatus, pull.Locator{
 				Owner:  ownerName,
 				Repo:   repoName,
 				Number: pr.GetNumber(),

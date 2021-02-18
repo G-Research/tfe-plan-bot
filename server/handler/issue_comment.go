@@ -26,6 +26,7 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/palantir/policy-bot/policy/approval"
+	"github.com/palantir/policy-bot/policy/common"
 
 	"github.com/G-Research/tfe-plan-bot/plan"
 	"github.com/G-Research/tfe-plan-bot/pull"
@@ -97,7 +98,7 @@ func (h *IssueComment) Handle(ctx context.Context, eventType, deliveryID string,
 		logger.Warn().Str(LogKeyAudit, "issue_comment").Msg("Skipped tampering check because the policy is not valid")
 	}
 
-	return h.EvaluateFetchedConfig(ctx, prctx, false, client, fetchedConfig)
+	return h.EvaluateFetchedConfig(ctx, prctx, client, fetchedConfig, common.TriggerComment)
 }
 
 func (h *IssueComment) detectAndLogTampering(ctx context.Context, prctx pull.Context, client *github.Client, event github.IssueCommentEvent, config *plan.Config) bool {
