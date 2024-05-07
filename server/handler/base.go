@@ -24,7 +24,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/palantir/go-baseapp/baseapp"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/pkg/errors"
@@ -32,6 +32,7 @@ import (
 
 	"github.com/palantir/policy-bot/policy/common"
 	"github.com/palantir/policy-bot/policy/reviewer"
+	pbpull "github.com/palantir/policy-bot/pull"
 
 	"github.com/G-Research/tfe-plan-bot/plan"
 	"github.com/G-Research/tfe-plan-bot/pull"
@@ -48,6 +49,7 @@ type Base struct {
 	githubapp.ClientCreator
 
 	Installations     githubapp.InstallationsService
+	GlobalCache       pbpull.GlobalCache
 	ConfigFetcher     *ConfigFetcher
 	BaseConfig        *baseapp.HTTPConfig
 	TFEClientProvider *plan.ClientProvider
@@ -139,7 +141,7 @@ func (b *Base) Evaluate(ctx context.Context, installationID int64, trigger commo
 	}
 
 	mbrCtx := NewCrossOrgMembershipContext(ctx, client, loc.Owner, b.Installations, b.ClientCreator)
-	prctx, err := pull.NewGitHubContext(ctx, mbrCtx, client, v4client, b.HTTPClient, loc)
+	prctx, err := pull.NewGitHubContext(ctx, mbrCtx, b.GlobalCache, client, v4client, b.HTTPClient, loc)
 	if err != nil {
 		return err
 	}

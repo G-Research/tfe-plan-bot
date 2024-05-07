@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -74,7 +74,7 @@ func (h *IssueComment) Handle(ctx context.Context, eventType, deliveryID string,
 	ctx, logger := h.PreparePRContext(ctx, installationID, pr)
 
 	mbrCtx := NewCrossOrgMembershipContext(ctx, client, owner, h.Installations, h.ClientCreator)
-	prctx, err := pull.NewGitHubContext(ctx, mbrCtx, client, v4client, h.HTTPClient, pull.Locator{
+	prctx, err := pull.NewGitHubContext(ctx, mbrCtx, h.GlobalCache, client, v4client, h.HTTPClient, pull.Locator{
 		Owner:  owner,
 		Repo:   repo.GetName(),
 		Number: number,
@@ -90,7 +90,7 @@ func (h *IssueComment) Handle(ctx context.Context, eventType, deliveryID string,
 	}
 
 	if fetchedConfig.Valid() {
-		tampered := h.detectAndLogTampering(ctx, prctx, client, event, fetchedConfig.Config)
+		tampered := h.detectAndLogTampering(ctx, event, fetchedConfig.Config)
 		if tampered {
 			return nil
 		}
@@ -101,7 +101,7 @@ func (h *IssueComment) Handle(ctx context.Context, eventType, deliveryID string,
 	return h.EvaluateFetchedConfig(ctx, prctx, client, fetchedConfig, common.TriggerComment)
 }
 
-func (h *IssueComment) detectAndLogTampering(ctx context.Context, prctx pull.Context, client *github.Client, event github.IssueCommentEvent, config *plan.Config) bool {
+func (h *IssueComment) detectAndLogTampering(ctx context.Context, event github.IssueCommentEvent, config *plan.Config) bool {
 	logger := zerolog.Ctx(ctx)
 
 	var originalBody string

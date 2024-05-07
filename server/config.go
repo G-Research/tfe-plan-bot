@@ -46,7 +46,8 @@ type LoggingConfig struct {
 }
 
 type CachingConfig struct {
-	MaxSize datasize.ByteSize `yaml:"max_size"`
+	MaxSize      datasize.ByteSize `yaml:"max_size"`
+	PushedAtSize int               `yaml:"pushed_at_size"`
 }
 
 type WorkerConfig struct {

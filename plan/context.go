@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/hashicorp/go-tfe"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"

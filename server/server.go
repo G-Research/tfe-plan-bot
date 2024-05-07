@@ -27,6 +27,7 @@ import (
 	"github.com/palantir/go-baseapp/baseapp"
 	"github.com/palantir/go-baseapp/baseapp/datadog"
 	"github.com/palantir/go-githubapp/githubapp"
+	"github.com/palantir/policy-bot/pull"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"goji.io/pat"
@@ -91,6 +92,16 @@ func New(c *Config) (*Server, error) {
 		return nil, errors.Wrap(err, "failed to get configured GitHub app")
 	}
 
+	pushedAtSize := c.Cache.PushedAtSize
+	if pushedAtSize == 0 {
+		pushedAtSize = 100_000
+	}
+
+	globalCache, err := pull.NewLRUGlobalCache(pushedAtSize)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize global cache")
+	}
+
 	// TODO(jgiannuzzi) use ClientLogging with a different message than github_request
 	tp, err := plan.NewClientProvider(
 		c.TFE,
@@ -113,6 +124,7 @@ func New(c *Config) (*Server, error) {
 		ClientCreator:     cc,
 		BaseConfig:        &c.Server,
 		Installations:     githubapp.NewInstallationsService(appClient),
+		GlobalCache:       globalCache,
 		TFEClientProvider: tp,
 		HTTPClient:        httpClient,
 
