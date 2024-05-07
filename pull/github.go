@@ -16,7 +16,6 @@ package pull
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -128,7 +127,7 @@ func (ghc *GitHubContext) DownloadCode() (string, func(), error) {
 	}
 	defer resp.Body.Close()
 
-	dir, err := ioutil.TempDir("", "tfe-plan-bot")
+	dir, err := os.MkdirTemp("", "tfe-plan-bot")
 	if err != nil {
 		return "", func() {}, err
 	}

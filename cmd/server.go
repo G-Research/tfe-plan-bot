@@ -16,7 +16,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/pkg/errors"
@@ -50,7 +49,7 @@ func readServerConfig(cfgFile string) (*server.Config, error) {
 	}
 
 	var bytes []byte
-	bytes, err = ioutil.ReadFile(cfgFile)
+	bytes, err = os.ReadFile(cfgFile)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed reading server config file: %s", cfgFile)
 	}

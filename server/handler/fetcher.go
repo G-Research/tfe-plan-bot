@@ -18,7 +18,7 @@ package handler
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/google/go-github/v53/github"
@@ -145,7 +145,7 @@ func (cf *ConfigFetcher) fetchConfigContents(ctx context.Context, client *github
 					logger.Error().Err(cerr).Msgf("Failed to close reader for %s/%s@%s/%s", owner, repo, ref, path)
 				}
 			}()
-			downloadedContent, readErr := ioutil.ReadAll(reader)
+			downloadedContent, readErr := io.ReadAll(reader)
 			if readErr != nil {
 				return nil, errors.Wrapf(readErr, "failed to read content of %s/%s/@%s/%s", owner, repo, ref, path)
 			}
