@@ -19,7 +19,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/palantir/policy-bot/policy/common"
 	"github.com/pkg/errors"
@@ -39,6 +39,11 @@ func (h *PullRequestReview) Handle(ctx context.Context, eventType, deliveryID st
 	var event github.PullRequestReviewEvent
 	if err := json.Unmarshal(payload, &event); err != nil {
 		return errors.Wrap(err, "failed to parse pull request review event payload")
+	}
+
+	// Ignore events triggered by policy-bot (e.g. for dismissing stale reviews)
+	if event.GetSender().GetLogin() == h.AppName+"[bot]" {
+		return nil
 	}
 
 	installationID := githubapp.GetInstallationIDFromEvent(&event)

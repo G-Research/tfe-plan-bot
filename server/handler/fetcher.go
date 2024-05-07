@@ -18,10 +18,10 @@ package handler
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"gopkg.in/yaml.v2"
@@ -135,7 +135,7 @@ func (cf *ConfigFetcher) fetchConfigContents(ctx context.Context, client *github
 		}
 		if ok && isTooLargeError(rerr) {
 			// GetContents only supports file sizes up to 1 MB, DownloadContents supports files up to 100 MB (with an additional API call)
-			reader, err := client.Repositories.DownloadContents(ctx, owner, repo, path, opts)
+			reader, _, err := client.Repositories.DownloadContents(ctx, owner, repo, path, opts)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to download content of %s/%s@%s/%s", owner, repo, ref, path)
 			}
@@ -145,7 +145,7 @@ func (cf *ConfigFetcher) fetchConfigContents(ctx context.Context, client *github
 					logger.Error().Err(cerr).Msgf("Failed to close reader for %s/%s@%s/%s", owner, repo, ref, path)
 				}
 			}()
-			downloadedContent, readErr := ioutil.ReadAll(reader)
+			downloadedContent, readErr := io.ReadAll(reader)
 			if readErr != nil {
 				return nil, errors.Wrapf(readErr, "failed to read content of %s/%s/@%s/%s", owner, repo, ref, path)
 			}

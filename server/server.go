@@ -27,6 +27,7 @@ import (
 	"github.com/palantir/go-baseapp/baseapp"
 	"github.com/palantir/go-baseapp/baseapp/datadog"
 	"github.com/palantir/go-githubapp/githubapp"
+	"github.com/palantir/policy-bot/pull"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"goji.io/pat"
@@ -34,6 +35,16 @@ import (
 	"github.com/G-Research/tfe-plan-bot/plan"
 	"github.com/G-Research/tfe-plan-bot/server/handler"
 	"github.com/G-Research/tfe-plan-bot/version"
+)
+
+const (
+	DefaultGitHubTimeout = 10 * time.Second
+
+	DefaultWebhookWorkers   = 10
+	DefaultWebhookQueueSize = 100
+
+	DefaultHTTPCacheSize     = 50 * datasize.MB
+	DefaultPushedAtCacheSize = 100_000
 )
 
 type Server struct {
@@ -54,7 +65,7 @@ func New(c *Config) (*Server, error) {
 		return nil, errors.Wrap(err, "failed to initialize base server")
 	}
 
-	maxSize := int64(50 * datasize.MB)
+	maxSize := int64(DefaultHTTPCacheSize)
 	if c.Cache.MaxSize != 0 {
 		maxSize = int64(c.Cache.MaxSize)
 	}
@@ -91,6 +102,16 @@ func New(c *Config) (*Server, error) {
 		return nil, errors.Wrap(err, "failed to get configured GitHub app")
 	}
 
+	pushedAtSize := c.Cache.PushedAtSize
+	if pushedAtSize == 0 {
+		pushedAtSize = DefaultPushedAtCacheSize
+	}
+
+	globalCache, err := pull.NewLRUGlobalCache(pushedAtSize)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize global cache")
+	}
+
 	// TODO(jgiannuzzi) use ClientLogging with a different message than github_request
 	tp, err := plan.NewClientProvider(
 		c.TFE,
@@ -113,6 +134,7 @@ func New(c *Config) (*Server, error) {
 		ClientCreator:     cc,
 		BaseConfig:        &c.Server,
 		Installations:     githubapp.NewInstallationsService(appClient),
+		GlobalCache:       globalCache,
 		TFEClientProvider: tp,
 		HTTPClient:        httpClient,
 
@@ -126,12 +148,12 @@ func New(c *Config) (*Server, error) {
 
 	queueSize := c.Workers.QueueSize
 	if queueSize < 1 {
-		queueSize = 100
+		queueSize = DefaultWebhookQueueSize
 	}
 
 	workers := c.Workers.Workers
 	if workers < 1 {
-		workers = 10
+		workers = DefaultWebhookWorkers
 	}
 
 	dispatcher := githubapp.NewEventDispatcher(

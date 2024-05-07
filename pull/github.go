@@ -16,14 +16,13 @@ package pull
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/codeclysm/extract"
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/pkg/errors"
 	"github.com/shurcooL/githubv4"
 
@@ -78,8 +77,8 @@ type GitHubContext struct {
 	httpClient *http.Client
 }
 
-func NewGitHubContext(ctx context.Context, mbrCtx pull.MembershipContext, client *github.Client, v4client *githubv4.Client, httpClient *http.Client, loc Locator) (Context, error) {
-	ghc, err := pull.NewGitHubContext(ctx, mbrCtx, client, v4client, pull.Locator(loc))
+func NewGitHubContext(ctx context.Context, mbrCtx pull.MembershipContext, globalCache pull.GlobalCache, client *github.Client, v4client *githubv4.Client, httpClient *http.Client, loc Locator) (Context, error) {
+	ghc, err := pull.NewGitHubContext(ctx, mbrCtx, globalCache, client, v4client, pull.Locator(loc))
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +127,7 @@ func (ghc *GitHubContext) DownloadCode() (string, func(), error) {
 	}
 	defer resp.Body.Close()
 
-	dir, err := ioutil.TempDir("", "tfe-plan-bot")
+	dir, err := os.MkdirTemp("", "tfe-plan-bot")
 	if err != nil {
 		return "", func() {}, err
 	}

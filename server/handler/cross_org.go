@@ -19,7 +19,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/pkg/errors"
 
@@ -87,14 +87,6 @@ func (c *CrossOrgMembershipContext) IsOrgMember(org, user string) (bool, error) 
 		return false, err
 	}
 	return mbrCtx.IsOrgMember(org, user)
-}
-
-func (c *CrossOrgMembershipContext) IsCollaborator(org, repo, user, desiredPerm string) (bool, error) {
-	mbrCtx, err := c.getCtxForOrg(org)
-	if err != nil {
-		return false, err
-	}
-	return mbrCtx.IsCollaborator(org, repo, user, desiredPerm)
 }
 
 func (c *CrossOrgMembershipContext) OrganizationMembers(org string) ([]string, error) {
