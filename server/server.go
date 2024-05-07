@@ -37,6 +37,16 @@ import (
 	"github.com/G-Research/tfe-plan-bot/version"
 )
 
+const (
+	DefaultGitHubTimeout = 10 * time.Second
+
+	DefaultWebhookWorkers   = 10
+	DefaultWebhookQueueSize = 100
+
+	DefaultHTTPCacheSize     = 50 * datasize.MB
+	DefaultPushedAtCacheSize = 100_000
+)
+
 type Server struct {
 	config *Config
 	base   *baseapp.Server
@@ -55,7 +65,7 @@ func New(c *Config) (*Server, error) {
 		return nil, errors.Wrap(err, "failed to initialize base server")
 	}
 
-	maxSize := int64(50 * datasize.MB)
+	maxSize := int64(DefaultHTTPCacheSize)
 	if c.Cache.MaxSize != 0 {
 		maxSize = int64(c.Cache.MaxSize)
 	}
@@ -94,7 +104,7 @@ func New(c *Config) (*Server, error) {
 
 	pushedAtSize := c.Cache.PushedAtSize
 	if pushedAtSize == 0 {
-		pushedAtSize = 100_000
+		pushedAtSize = DefaultPushedAtCacheSize
 	}
 
 	globalCache, err := pull.NewLRUGlobalCache(pushedAtSize)
@@ -138,12 +148,12 @@ func New(c *Config) (*Server, error) {
 
 	queueSize := c.Workers.QueueSize
 	if queueSize < 1 {
-		queueSize = 100
+		queueSize = DefaultWebhookQueueSize
 	}
 
 	workers := c.Workers.Workers
 	if workers < 1 {
-		workers = 10
+		workers = DefaultWebhookWorkers
 	}
 
 	dispatcher := githubapp.NewEventDispatcher(
