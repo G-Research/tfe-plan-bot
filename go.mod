@@ -9,8 +9,7 @@ require (
 	github.com/google/go-github/v53 v53.2.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/h2non/filetype v1.1.0 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
-	github.com/hashicorp/go-tfe v0.10.2
+	github.com/hashicorp/go-tfe v1.56.0
 	github.com/juju/errors v0.0.0-20200330140219-3fe23663418f // indirect
 	github.com/juju/testing v0.0.0-20200706033705-4c23f9c453cd // indirect
 	github.com/palantir/go-baseapp v0.5.1
