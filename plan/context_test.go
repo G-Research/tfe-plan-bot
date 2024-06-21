@@ -179,14 +179,14 @@ func (mpc *MockPullContext) Labels() ([]string, error) {
 
 func TestMatchPR(t *testing.T) {
 	testCases := []struct {
-		Name                       string
-		WorkingDirectory           string
-		CommonWorkspaceDirectories []string
-		SkipCommonDirectories      bool
-		PullContext                MockPullContext
-		TargetBranch               string
-		ExpectedMatch              bool
-		ExpectedError              error
+		Name                      string
+		WorkingDirectory          string
+		UniversalMatchDirectories []string
+		SkipUniversalDirectories  bool
+		PullContext               MockPullContext
+		TargetBranch              string
+		ExpectedMatch             bool
+		ExpectedError             error
 	}{
 		{
 			"Match '.'",
@@ -385,25 +385,25 @@ func TestMatchPR(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("Test Case: %s", tc.Name), func(t *testing.T) {
 			cfg := &Config{
-				CommonWorkspaceDirectories: tc.CommonWorkspaceDirectories,
+				UniversalMatchDirectories: tc.UniversalMatchDirectories,
 			}
 			wkCfg := WorkspaceConfig{
-				Organization:          "test_org",
-				Name:                  "test_name",
-				WorkingDirectory:      tc.WorkingDirectory,
-				Branch:                tc.TargetBranch,
-				Policy:                policy.Policy{},
-				ShowSkipped:           false,
-				SkipCommonDirectories: tc.SkipCommonDirectories,
+				Organization:             "test_org",
+				Name:                     "test_name",
+				WorkingDirectory:         tc.WorkingDirectory,
+				Branch:                   tc.TargetBranch,
+				Policy:                   policy.Policy{},
+				ShowSkipped:              false,
+				SkipUniversalDirectories: tc.SkipUniversalDirectories,
 			}
 			ghClient := &github.Client{}
 			plCtx := Context{
-				ctx:                        context.Background(),
-				wkcfg:                      wkCfg,
-				commonWorkspaceDirectories: cfg.CommonWorkspaceDirectories,
-				prctx:                      &tc.PullContext,
-				ghClient:                   ghClient,
-				tfeClient:                  nil,
+				ctx:                       context.Background(),
+				wkcfg:                     wkCfg,
+				universalMatchDirectories: cfg.UniversalMatchDirectories,
+				prctx:                     &tc.PullContext,
+				ghClient:                  ghClient,
+				tfeClient:                 nil,
 			}
 
 			matched, err := plCtx.matchPR()

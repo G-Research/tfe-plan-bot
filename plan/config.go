@@ -25,10 +25,10 @@ type Config struct {
 	Workspaces    []WorkspaceConfig `yaml:"workspaces"`
 	ApprovalRules []*approval.Rule  `yaml:"approval_rules"`
 	Comments      []Comment         `yaml:"comments"`
-	// If changed files match any of these directories, then all workspaces
-	// will be matched.
-	CommonWorkspaceDirectories []string `yaml:"common_workspace_directories"`
-	commentsParsed             bool
+	// If changed files within a PR match any of these directories, then all
+	// relevant workspaces will be matched.
+	UniversalMatchDirectories []string `yaml:"universal_match_directories"`
+	commentsParsed            bool
 }
 
 type WorkspaceConfig struct {
@@ -40,8 +40,8 @@ type WorkspaceConfig struct {
 	Comment          string        `yaml:"comment"`
 	ShowSkipped      bool          `yaml:"show_skipped"`
 	// Allows the exclusion of this workspace from being considered when
-	// evaluating Config.CommonWorkspaceDirectories
-	SkipCommonDirectories bool `yaml:"skip_common_directories"`
+	// evaluating Config.UniversalMatchDirectories
+	SkipUniversalDirectories bool `yaml:"skip_universal_directories"`
 }
 
 type Comment struct {
