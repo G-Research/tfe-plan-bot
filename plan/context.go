@@ -28,6 +28,7 @@ import (
 
 	"github.com/palantir/policy-bot/policy"
 	"github.com/palantir/policy-bot/policy/common"
+	policy_pull "github.com/palantir/policy-bot/pull"
 
 	"github.com/G-Research/tfe-plan-bot/pull"
 )
@@ -38,10 +39,11 @@ const (
 )
 
 type Context struct {
-	ctx       context.Context
-	wkcfg     WorkspaceConfig
-	prctx     pull.Context
-	evaluator common.Evaluator
+	ctx                        context.Context
+	wkcfg                      WorkspaceConfig
+	commonWorkspaceDirectories []string
+	prctx                      pull.Context
+	evaluator                  common.Evaluator
 
 	ghClient *github.Client
 
@@ -68,10 +70,11 @@ func NewContext(ctx context.Context, wkcfg WorkspaceConfig, prctx pull.Context, 
 	logger := zerolog.Ctx(ctx).With().Str(LogKeyTFEWorkspace, wkcfg.String()).Logger()
 
 	return &Context{
-		ctx:       logger.WithContext(ctx),
-		wkcfg:     wkcfg,
-		prctx:     prctx,
-		evaluator: evaluator,
+		ctx:                        logger.WithContext(ctx),
+		wkcfg:                      wkcfg,
+		commonWorkspaceDirectories: cfg.CommonWorkspaceDirectories,
+		prctx:                      prctx,
+		evaluator:                  evaluator,
 
 		ghClient: v3client,
 
@@ -271,26 +274,41 @@ func (pc *Context) runMessage() string {
 func (pc *Context) matchPR() (bool, error) {
 	baseBranch, _ := pc.prctx.Branches()
 
+	// If the pull is not targeting the relevant base branch, then no match.
 	if baseBranch != pc.branch() {
 		return false, nil
 	}
 
-	if pc.workingDirectory() != "." {
-		changedFiles, err := pc.prctx.ChangedFiles()
-		if err != nil {
-			return false, errors.Wrap(err, "failed to get changed files")
-		}
-
+	doFilesMatchDirectory := func(changedFiles []*policy_pull.File, dir string) bool {
 		for _, file := range changedFiles {
-			if strings.HasPrefix(file.Filename, pc.workingDirectory()+"/") {
-				return true, nil
+			if strings.HasPrefix(file.Filename, dir+"/") {
+				return true
 			}
 		}
 
-		return false, nil
+		return false
 	}
 
-	return true, nil
+	changedFiles, err := pc.prctx.ChangedFiles()
+	if err != nil {
+		return false, errors.Wrap(err, "failed to get changed files")
+	}
+
+	// Evaluate common directories if enabled.
+	if !pc.wkcfg.SkipCommonDirectories {
+		for _, dir := range pc.commonWorkspaceDirectories {
+			if doFilesMatchDirectory(changedFiles, dir) {
+				return true, nil
+			}
+		}
+	}
+
+	// Evaluate working directory
+	if pc.workingDirectory() == "." {
+		return true, nil
+	} else {
+		return doFilesMatchDirectory(changedFiles, pc.workingDirectory()), nil
+	}
 }
 
 func (pc *Context) shouldComment() (bool, error) {

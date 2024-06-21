@@ -25,8 +25,10 @@ type Config struct {
 	Workspaces    []WorkspaceConfig `yaml:"workspaces"`
 	ApprovalRules []*approval.Rule  `yaml:"approval_rules"`
 	Comments      []Comment         `yaml:"comments"`
-
-	commentsParsed bool
+	// If changed files match any of these directories, then all workspaces
+	// will be matched.
+	CommonWorkspaceDirectories []string `yaml:"common_workspace_directories"`
+	commentsParsed             bool
 }
 
 type WorkspaceConfig struct {
@@ -37,6 +39,9 @@ type WorkspaceConfig struct {
 	Policy           policy.Policy `yaml:"policy"`
 	Comment          string        `yaml:"comment"`
 	ShowSkipped      bool          `yaml:"show_skipped"`
+	// Allows the exclusion of this workspace from being considered when
+	// evaluating Config.CommonWorkspaceDirectories
+	SkipCommonDirectories bool `yaml:"skip_common_directories"`
 }
 
 type Comment struct {
