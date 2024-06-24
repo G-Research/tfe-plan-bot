@@ -25,8 +25,10 @@ type Config struct {
 	Workspaces    []WorkspaceConfig `yaml:"workspaces"`
 	ApprovalRules []*approval.Rule  `yaml:"approval_rules"`
 	Comments      []Comment         `yaml:"comments"`
-
-	commentsParsed bool
+	// If changed files within a PR match any of these prefixes/directories,
+	// then all relevant workspaces will be matched.
+	TriggerPrefixes []string `yaml:"trigger_prefixes"`
+	commentsParsed  bool
 }
 
 type WorkspaceConfig struct {
@@ -37,6 +39,9 @@ type WorkspaceConfig struct {
 	Policy           policy.Policy `yaml:"policy"`
 	Comment          string        `yaml:"comment"`
 	ShowSkipped      bool          `yaml:"show_skipped"`
+	// Allows the exclusion of this workspace from being considered when
+	// evaluating Config.TriggerPrefixes
+	SkipTriggerPrefixes bool `yaml:"skip_trigger_prefixes"`
 }
 
 type Comment struct {

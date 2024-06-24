@@ -3,6 +3,8 @@ workspaces:
     name: name
     #branch: main
     #working_directory: working_directory
+    # If true, trigger_prefixes will *not* be used to match this workspace.
+    skip_trigger_prefixes: false
     comment: guide
     policy:
       approval:
@@ -27,6 +29,15 @@ approval_rules:
       count: 1
       teams:
         - "org/tf-approvers"
+
+# If any changed files from a PR match the following prefixes, then *all*
+# defined workspaces will trigger, unless that workspace has 
+# "skip_trigger_prefixes" set to true.
+# For example, a file named "docs/README.md" will match the first prefix below,
+# but a file named "tests/unit_test.go" will NOT match any prefixes below.
+trigger_prefixes:
+  - "docs"
+  - "src"
 
 comments:
   - name: guide
