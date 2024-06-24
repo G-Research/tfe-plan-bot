@@ -33,7 +33,7 @@ approval_rules:
 # If any changed files from a PR match the following prefixes, then *all*
 # defined workspaces will trigger, unless that workspace has 
 # "skip_trigger_prefixes" set to true.
-# For example, a file named "docs/README.rm" will match the first prefix below,
+# For example, a file named "docs/README.md" will match the first prefix below,
 # but a file named "tests/unit_test.go" will NOT match any prefixes below.
 trigger_prefixes:
   - "docs"
