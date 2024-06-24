@@ -40,7 +40,7 @@ type WorkspaceConfig struct {
 	Comment          string        `yaml:"comment"`
 	ShowSkipped      bool          `yaml:"show_skipped"`
 	// Allows the exclusion of this workspace from being considered when
-	// evaluating Config.CommonMatchPaths
+	// evaluating Config.TriggerPrefixes
 	SkipTriggerPrefixes bool `yaml:"skip_trigger_prefixes"`
 }
 
