@@ -39,11 +39,11 @@ const (
 )
 
 type Context struct {
-	ctx                       context.Context
-	wkcfg                     WorkspaceConfig
-	universalMatchDirectories []string
-	prctx                     pull.Context
-	evaluator                 common.Evaluator
+	ctx             context.Context
+	wkcfg           WorkspaceConfig
+	triggerPrefixes []string
+	prctx           pull.Context
+	evaluator       common.Evaluator
 
 	ghClient *github.Client
 
@@ -70,11 +70,11 @@ func NewContext(ctx context.Context, wkcfg WorkspaceConfig, prctx pull.Context, 
 	logger := zerolog.Ctx(ctx).With().Str(LogKeyTFEWorkspace, wkcfg.String()).Logger()
 
 	return &Context{
-		ctx:                       logger.WithContext(ctx),
-		wkcfg:                     wkcfg,
-		universalMatchDirectories: cfg.UniversalMatchDirectories,
-		prctx:                     prctx,
-		evaluator:                 evaluator,
+		ctx:             logger.WithContext(ctx),
+		wkcfg:           wkcfg,
+		triggerPrefixes: cfg.TriggerPrefixes,
+		prctx:           prctx,
+		evaluator:       evaluator,
 
 		ghClient: v3client,
 
@@ -295,8 +295,8 @@ func (pc *Context) matchPR() (bool, error) {
 	}
 
 	// Evaluate common directories if enabled.
-	if !pc.wkcfg.SkipUniversalDirectories {
-		for _, dir := range pc.universalMatchDirectories {
+	if !pc.wkcfg.SkipTriggerPrefixes {
+		for _, dir := range pc.triggerPrefixes {
 			if doFilesMatchDirectory(changedFiles, dir) {
 				return true, nil
 			}
