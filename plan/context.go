@@ -281,6 +281,10 @@ func (pc *Context) matchPR() (bool, error) {
 
 	doFilesMatchDirectory := func(changedFiles []*policy_pull.File, dir string) bool {
 		for _, file := range changedFiles {
+			if file == nil {
+				fmt.Printf("File: %s is nil\n", file)
+				continue
+			} 
 			if strings.HasPrefix(file.Filename, dir+"/") {
 				return true
 			}
