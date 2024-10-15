@@ -380,6 +380,27 @@ func TestMatchPR(t *testing.T) {
 			false,
 			errors.New("oops"),
 		},
+		{
+			"nil slices in file list",
+			"test",
+			[]string{},
+			true, 
+			MockPullContext{
+				defaultBranch: "test_branch",
+				changedFiles: []*pull.File{
+					{
+						Filename:  "alpha/file.go",
+						Status:    0,
+						Additions: 5,
+						Deletions: 5,
+					},
+					nil,
+				},
+			},
+			"main",
+			false,
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {
