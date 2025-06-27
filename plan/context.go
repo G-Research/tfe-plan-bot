@@ -354,14 +354,18 @@ func (pc *Context) postCommentIfNeeded() {
 }
 
 func (pc *Context) validate(wk *tfe.Workspace) error {
-	wkBranch := wk.VCSRepo.Branch
+	var wkBranch string
+	if wk.VCSRepo != nil {
+		wkBranch = wk.VCSRepo.Branch
+	}
+
 	if wkBranch == "" {
 		wkBranch = pc.prctx.DefaultBranch()
 	}
 
 	if pc.branch() != wkBranch {
 		return errors.Errorf("workspace branch mismatch: config=%q tfe=%q",
-			pc.wkcfg.Branch, wk.VCSRepo.Branch)
+			pc.wkcfg.Branch, wkBranch)
 	}
 
 	if pc.workingDirectory() != path.Clean(wk.WorkingDirectory) {
