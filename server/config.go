@@ -20,7 +20,7 @@ import (
 
 	"github.com/c2h5oh/datasize"
 	"github.com/palantir/go-baseapp/baseapp"
-	"github.com/palantir/go-baseapp/baseapp/datadog"
+	"github.com/palantir/go-baseapp/appmetrics/emitter/datadog"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
