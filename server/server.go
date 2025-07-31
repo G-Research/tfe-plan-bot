@@ -25,7 +25,7 @@ import (
 	"github.com/die-net/lrucache"
 	"github.com/gregjones/httpcache"
 	"github.com/palantir/go-baseapp/baseapp"
-	"github.com/palantir/go-baseapp/baseapp/datadog"
+	"github.com/palantir/go-baseapp/appmetrics/emitter/datadog"
 	"github.com/palantir/go-githubapp/githubapp"
 	"github.com/palantir/policy-bot/pull"
 	"github.com/pkg/errors"
