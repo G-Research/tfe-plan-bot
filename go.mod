@@ -19,7 +19,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.1
 	github.com/shurcooL/githubv4 v0.0.0-20230704064427-599ae7bbf278
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.1
 	goji.io v2.0.2+incompatible
 	gopkg.in/yaml.v2 v2.4.0
 )
