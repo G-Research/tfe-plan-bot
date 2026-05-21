@@ -171,7 +171,7 @@ func (b *Base) EvaluateFetchedConfig(ctx context.Context, prctx pull.Context, cl
 	// The pull.Context is not thread-safe, so this ensures a single API call
 	// to GET /repos/:owner/:repo/pulls/:number/files and populates the cache
 	// before concurrent access.
-	_, err = prctx.ChangedFiles()
+	_, err := prctx.ChangedFiles()
 	if err != nil {
 		return errors.Wrap(err, "failed to list pull request files")
 	}
@@ -346,4 +346,3 @@ func selectionToReviewersRequest(s reviewer.Selection) github.ReviewersRequest {
 
 	return req
 }
-
