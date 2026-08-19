@@ -87,22 +87,46 @@ func (b *Base) PostStatus(ctx context.Context, prctx pull.Context, wkcfg plan.Wo
 	owner := prctx.RepositoryOwner()
 	repo := prctx.RepositoryName()
 	sha := prctx.HeadSHA()
+	statusContext := b.statusCheckContext(wkcfg)
+
+	var targetURL string
+	if runID != "" {
+		targetURL = b.targetURL(wkcfg, runID)
+	}
+
+	// Skip the write entirely if the status we are about to post is
+	// identical to what is already on the commit. The bot can be
+	// re-evaluated many times for the same, unchanged commit - a burst of
+	// unrelated commits/reviews/checks on the same PR each cause a full
+	// workspace sweep - and most of those re-evaluations produce exactly
+	// the same result as before. Without this check, every one of them
+	// still pays for a fresh POST /repos/:owner/:repo/statuses/:sha, which
+	// is by far the most expensive call this bot makes (roughly 1s each,
+	// since writing a status invalidates the commit's combined-status
+	// rollup and fans out webhooks to every subscriber - including this
+	// bot itself). This check costs nothing extra: LatestDetailedStatuses
+	// is already fetched and cached once per evaluation round.
+	existing, err := prctx.LatestDetailedStatuses()
+	if err != nil {
+		return errors.Wrap(err, "failed to check existing status before posting")
+	}
+	if current, ok := existing[statusContext]; ok {
+		if current.GetState() == state && current.GetDescription() == message && current.GetTargetURL() == targetURL {
+			zerolog.Ctx(ctx).Debug().Msgf("Status %q on %s is already up to date, skipping write", statusContext, sha)
+			return nil
+		}
+	}
 
 	status := &github.RepoStatus{
-		Context:     github.String(b.statusCheckContext(wkcfg)),
+		Context:     github.String(statusContext),
 		State:       &state,
 		Description: &message,
 	}
-
-	if runID != "" {
-		status.TargetURL = github.String(b.targetURL(wkcfg, runID))
+	if targetURL != "" {
+		status.TargetURL = github.String(targetURL)
 	}
 
-	if err := b.postGitHubRepoStatus(ctx, client, owner, repo, sha, status); err != nil {
-		return err
-	}
-
-	return nil
+	return b.postGitHubRepoStatus(ctx, client, owner, repo, sha, status)
 }
 
 func (b *Base) postGitHubRepoStatus(ctx context.Context, client *github.Client, owner, repo, ref string, status *github.RepoStatus) error {
@@ -346,4 +370,3 @@ func selectionToReviewersRequest(s reviewer.Selection) github.ReviewersRequest {
 
 	return req
 }
-

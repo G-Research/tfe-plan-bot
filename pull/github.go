@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/codeclysm/extract"
 	"github.com/google/go-github/v53/github"
@@ -75,6 +76,16 @@ type GitHubContext struct {
 	client     *github.Client
 	pr         *v4PullRequest
 	httpClient *http.Client
+
+	// statusesOnce and its guarded fields cache the result of
+	// LatestDetailedStatuses for the lifetime of this context. A single
+	// GitHubContext is shared by all workspace evaluations for one webhook
+	// event, so without this cache every configured workspace would issue
+	// its own (potentially multi-page) request for the same combined status
+	// data.
+	statusesOnce sync.Once
+	statuses     map[string]*github.RepoStatus
+	statusesErr  error
 }
 
 func NewGitHubContext(ctx context.Context, mbrCtx pull.MembershipContext, globalCache pull.GlobalCache, client *github.Client, v4client *githubv4.Client, httpClient *http.Client, loc Locator) (Context, error) {
@@ -143,6 +154,13 @@ func (ghc *GitHubContext) DownloadCode() (string, func(), error) {
 }
 
 func (ghc *GitHubContext) LatestDetailedStatuses() (map[string]*github.RepoStatus, error) {
+	ghc.statusesOnce.Do(func() {
+		ghc.statuses, ghc.statusesErr = ghc.loadLatestDetailedStatuses()
+	})
+	return ghc.statuses, ghc.statusesErr
+}
+
+func (ghc *GitHubContext) loadLatestDetailedStatuses() (map[string]*github.RepoStatus, error) {
 	opt := &github.ListOptions{
 		PerPage: 100,
 	}
